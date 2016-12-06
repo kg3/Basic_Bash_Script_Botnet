@@ -14,7 +14,7 @@ ADD=`/sbin/ifconfig | grep 'Bcast' | cut -d ':' -f 2 | cut -d ' ' -f 1 | cut -d 
 FILE=file_$ADD
 #FIRST=first_$FILE
 
-CMNDS=( $FILE $FIRST )
+CMNDS=( $FILE )
 
 DIR=/dev/shm/
 TOOLS=.tools/
