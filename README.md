@@ -1,5 +1,5 @@
-# Basic_Bash_Script_Repository
-## A simple botnet made for a capture the flag game based on Mafia-2007
+# Basic_Bash_Script_Botnet
+## A simple (very detectable) botnet made for a capture the flag game based on Mafia-2007
 Servers are running Unbuntu 7.10
 
 - The ctf_sploiting.py script utilizes two code execution vulnerabilities to download the exp.sh script
