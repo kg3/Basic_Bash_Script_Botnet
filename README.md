@@ -8,6 +8,7 @@ Servers are running Unbuntu 7.10
 - When cmnd.sh is executed (from the first run of exp.sh) the 'cmnd.sh -c' command is inserted into /etc/crontab directly and ran every minute
 - 'cmnd.sh -c' grabs a file from the server called: file_[last 3 digits of IP]; and then executes every line/command of that file as root
   - Probably overkill to send commands trough the priv-esc, since crontab runs as root, but that's what happens coding in the 'am
+- 'dump.sh' calls all the locations of the flags and dumps them to a file
 
 ### List of exploits used
 - Local Privilege Escalation: Linux Kernel 2.4.x / 2.6.x - 'sock_sendpage()' https://www.exploit-db.com/exploits/9545/
