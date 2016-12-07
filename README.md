@@ -7,7 +7,7 @@ Servers are running Unbuntu 7.10
   - All tools and activities are done in /dev/shm/.tools/
 - When cmnd.sh is executed (from the first run of exp.sh) the 'cmnd.sh -c' command is inserted into /etc/crontab directly and ran every minute
 - 'cmnd.sh -c' grabs a file from the server called: file_[last 3 digits of IP]; and then executes every line/command of that file as root
-  - Probably overkill to send commands trough the priv-esc, since crontab runs as root, but that's what happens coding in the 'am
+  - Probably overkill to send commands through the priv-esc, since crontab runs as root, but that's what happens coding in the 'am
 - 'dump.sh' calls all the locations of the flags and dumps them to a file
 
 ### List of exploits used
